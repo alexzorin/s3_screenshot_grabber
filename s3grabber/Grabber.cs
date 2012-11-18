@@ -16,22 +16,38 @@ namespace s3grabber
 
         private static Bitmap CaptureScreen()
         {
-            Bitmap bmp = new Bitmap(Screen.PrimaryScreen.Bounds.Width,
-                                    Screen.PrimaryScreen.Bounds.Height,
-                                    PixelFormat.Format32bppArgb);
+            Point size = GetScreenSize();
+
+            Bitmap bmp = new Bitmap(size.X, size.Y, PixelFormat.Format32bppArgb);
 
             using (Graphics g = Graphics.FromImage(bmp))
             {
-
-                g.CopyFromScreen(Screen.PrimaryScreen.Bounds.X,
-                                 Screen.PrimaryScreen.Bounds.Y,
-                                 0,
-                                 0,
-                                 Screen.PrimaryScreen.Bounds.Size,
-                                 CopyPixelOperation.SourceCopy);
+                foreach (Screen s in Screen.AllScreens)
+                {
+                    g.CopyFromScreen(s.Bounds.X,
+                                     s.Bounds.Y,
+                                     s.Bounds.X,
+                                     s.Bounds.Y,
+                                     s.Bounds.Size,
+                                     CopyPixelOperation.SourceCopy);
+                }
             }
 
             return bmp;
+        }
+
+        public static Point GetScreenSize()
+        {
+            int maxwidth = 0;
+            int maxheight = 0;
+
+            foreach (Screen s in Screen.AllScreens)
+            {
+                maxwidth = Math.Max(maxwidth, s.Bounds.X + s.Bounds.Width);
+                maxheight = Math.Max(maxheight, s.Bounds.Y + s.Bounds.Height);
+
+            }
+            return new Point(maxwidth, maxheight);
         }
 
         private static ImageCodecInfo GetEncoder()
